@@ -1,0 +1,55 @@
+.team-form-section {
+  margin-top: 4px;
+  display: flex;
+  gap: 3px;
+  font-size: 12px;
+}
+
+.match-result {
+  display: inline-block;
+  font-weight: bold;
+  cursor: default;
+  height: 12px;
+  width: 12px;
+}
+
+.outline {
+  stroke: transparent;
+  fill: transparent;
+}
+
+.match-result:last-child .outline {
+  stroke: white;
+  fill: transparent;
+}
+.match-result:last-child {
+  border-radius: 100%;
+}
+.match-result.W:last-child {
+  background-color: #34a853;
+}
+
+.match-result.D:last-child {
+  background-color: #a4a79b;
+}
+
+.match-result.L:last-child {
+  background-color: #ea4335;
+}
+
+.oUnRP {
+  fill: #34a853;
+  stroke: #34a853;
+}
+.bI5Fmd {
+  fill: #a4a79b;
+  stroke: #a4a79b;
+}
+.yIOzif {
+  fill: #ea4335;
+  stroke: #ea4335;
+}
+
+.hIg8Hb {
+  fill: white;
+}

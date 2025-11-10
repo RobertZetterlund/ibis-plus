@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "IBIS 5 senaste",
+  "version": "1.0",
+  "description": "Visar ett lags 5 senaste resultat i IBIS",
+  "permissions": ["scripting", "activeTab"],
+  "host_permissions": ["http://statistik.innebandy.se/*"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://statistik.innebandy.se/ft.aspx?scr=table*"],
+      "js": ["content.js"],
+      "css": ["style.css"]
+    }
+  ]
+}
