@@ -4,7 +4,6 @@
   "version": "1.0",
   "description": "Förbättrar IBIS (statistik.innebandy.se), med ett lags fem senaste resultat.",
   "permissions": ["scripting"],
-  "host_permissions": ["http://statistik.innebandy.se/*"],
   "background": {
     "service_worker": "background.js"
   },
