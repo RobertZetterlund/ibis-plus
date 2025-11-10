@@ -1,8 +1,17 @@
+/** 
+ * Given a message, returns the html for the given league. Sends table back and forth to determine order to execute (placement first)
+ * message: {
+ *            tableData: {
+                teamName: string;
+                placement: number;
+              }[]
+              leagueId:string;
+            }
+*/
 chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
   if (message.action === "getTeamForm") {
     const fixtureURL = `http://statistik.innebandy.se/ft.aspx?scr=fixturelist&ftid=${message.leagueId}`;
-    const teamName = message.team;
-    const placement = message.placement;
+    const table = message.table;
 
     try {
       const res = await fetch(fixtureURL);
@@ -13,8 +22,7 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
         chrome.tabs.sendMessage(tabs[0].id, {
           action: "parseHTML",
           html: html,
-          teamName: teamName,
-          placement,
+          table: table,
         });
       });
       sendResponse(true);

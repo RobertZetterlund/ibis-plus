@@ -1,3 +1,6 @@
+/**
+ * Adds header to table, and requests the html from background worker.
+ */
 async function init() {
   // Get the current URL's query string
   const params = new URLSearchParams(window.location.search);
@@ -18,39 +21,35 @@ async function init() {
   formHeaderCell.textContent = "5 Senaste";
   headerRow.appendChild(formHeaderCell);
 
-  // Find all <td> elements that have the text "Totalt"
-  const cells = Array.from(document.querySelectorAll("td")).filter(
-    (td) => td.textContent.trim() === "Totalt"
-  );
+  // Find the <td> elements that have the text "Totalt"
+  const cells = Array.from(
+    document.querySelectorAll("table.clTblStandings thead td")
+  ).filter((td) => td.textContent.trim() === "Totalt");
 
+  // increment the colspan so it extends over new column
   cells.forEach((td) => {
     // Get the current colspan (default to 1 if missing)
     const current = parseInt(td.getAttribute("colspan")) || 1;
     td.setAttribute("colspan", current + 1);
   });
 
-  let placement = 1;
-  for (const link of teamLinks) {
-    const teamName = link.innerHTML.trim();
+  const tableData = Array.from(teamLinks).map((link, idx) => ({
+    teamName: link.innerHTML.trim(),
+    placement: idx + 1,
+  }));
 
-    // Request the last 5 match results from the background script
-    chrome.runtime.sendMessage({
-      action: "getTeamForm",
-      team: teamName,
-      placement,
-      leagueId,
-    });
-    placement++;
-  }
+  chrome.runtime.sendMessage({
+    action: "getTeamForm",
+    table: tableData,
+    leagueId,
+  });
 }
 init();
 
-// Listen for the parsed HTML from background.js
+// Listen for the parsed HTML from background.js, given the data, populates the rows.
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "parseHTML") {
-    const { html, teamName, placement } = message;
-    const spacelessTeamName = teamName.replaceAll(" ", "");
-
+    const { html, table: tableData } = message;
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");
 
@@ -59,83 +58,91 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       tr.querySelector(".clScore")
     );
 
-    // filter matches involving this team
-    const teamMatches = matchRows.filter((tr) =>
-      tr.textContent.replaceAll(" ", "").includes(spacelessTeamName)
-    );
+    for (const tableResult of tableData) {
+      // spaceless because sometimes the formatting is different between table and play-program view.
+      const spacelessTeamName = tableResult.teamName.replaceAll(" ", "");
 
-    // get last 5 matches
-    const last5 = teamMatches.slice(-5);
-
-    const results = last5.map((tr) => {
-      const scoreEl = tr.querySelector(".clScore");
-      const scoreText = (scoreEl ? scoreEl.textContent.trim() : "").replace(
-        /[^0-9-]/g,
-        ""
+      // filter matches involving this team
+      const teamMatches = matchRows.filter((tr) =>
+        tr.textContent.replaceAll(" ", "").includes(spacelessTeamName)
       );
-      const matchDesc =
-        tr.querySelector("td:nth-child(3)")?.textContent.trim() || "";
 
-      const [homeTeam, awayTeam] = matchDesc
-        .split("-")
-        .map((t) => t.replaceAll(" ", ""));
-      const [homeScore, awayScore] = scoreText
-        .split("-")
-        .map((s) => parseInt(s.trim(), 10));
+      // get last 5 matches
+      const last5 = teamMatches.slice(-5);
 
-      let symbol = "-";
-      let code = "D";
+      const results = last5.map((tr) => {
+        const scoreEl = tr.querySelector(".clScore");
+        const scoreText = (scoreEl ? scoreEl.textContent.trim() : "").replace(
+          /[^0-9-]/g,
+          ""
+        );
+        const matchDesc =
+          tr.querySelector("td:nth-child(3)")?.textContent.trim() || "";
 
-      if (!isNaN(homeScore) && !isNaN(awayScore)) {
-        const isHome = spacelessTeamName === homeTeam;
-        const won =
-          (isHome && homeScore > awayScore) ||
-          (!isHome && awayScore > homeScore);
-        const lost =
-          (isHome && homeScore < awayScore) ||
-          (!isHome && awayScore < homeScore);
+        const [homeTeam, awayTeam] = matchDesc
+          .split("-")
+          .map((t) => t.replaceAll(" ", ""));
+        const [homeScore, awayScore] = scoreText
+          .split("-")
+          .map((s) => parseInt(s.trim(), 10));
 
-        if (won) {
-          symbol = "W";
-          code = "W";
-        } else if (lost) {
-          symbol = "X";
-          code = "L";
+        let symbol = "-";
+        let code = "D";
+
+        if (!isNaN(homeScore) && !isNaN(awayScore)) {
+          const isHome = spacelessTeamName === homeTeam;
+          const won =
+            (isHome && homeScore > awayScore) ||
+            (!isHome && awayScore > homeScore);
+          const lost =
+            (isHome && homeScore < awayScore) ||
+            (!isHome && awayScore < homeScore);
+
+          if (won) {
+            symbol = "W";
+            code = "W";
+          } else if (lost) {
+            symbol = "X";
+            code = "L";
+          }
         }
+
+        return {
+          teamName: tableResult.teamName,
+          symbol,
+          result: code,
+          tooltip: `${matchDesc} (${scoreText})`,
+        };
+      });
+
+      const table = document.querySelector(".clCommonGrid.clTblStandings");
+
+      // get the row in tbody
+      const tbody = table.querySelector("tbody");
+      const tr = tbody.querySelector(`tr:nth-child(${tableResult.placement})`);
+      const newTd = document.createElement("td");
+      tr.append(newTd);
+      const newDiv = document.createElement("div");
+      newDiv.className = "match-result-container";
+
+      let idx = 0;
+      for (const match of results) {
+        const span = document.createElement("span");
+        span.className = `match-result ${match.result}`;
+        span.title = match.tooltip;
+
+        const resultSvg =
+          match.result === "W"
+            ? winSvg
+            : match.result === "L"
+            ? lossSvg
+            : drawSvg;
+        span.innerHTML = resultSvg;
+
+        newDiv.appendChild(span);
+        idx++;
       }
-
-      return {
-        teamName,
-        symbol,
-        result: code,
-        tooltip: `${matchDesc} (${scoreText})`,
-      };
-    });
-
-    const table = document.querySelector(".clCommonGrid.clTblStandings");
-
-    // get the row in tbody
-    const tbody = table.querySelector("tbody");
-    const tr = tbody.querySelector(`tr:nth-child(${placement})`);
-    const newTd = document.createElement("td");
-    tr.append(newTd);
-
-    let idx = 0;
-    for (const match of results) {
-      const span = document.createElement("span");
-      span.className = `match-result ${match.result}`;
-      span.title = match.tooltip;
-
-      const resultSvg =
-        match.result === "W"
-          ? winSvg
-          : match.result === "L"
-          ? lossSvg
-          : drawSvg;
-      span.innerHTML = resultSvg;
-
-      newTd.append(span);
-      idx++;
+      newTd.appendChild(newDiv);
     }
   }
 });

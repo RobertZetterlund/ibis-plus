@@ -1,16 +1,22 @@
 {
   "manifest_version": 3,
-  "name": "IBIS 5 senaste",
+  "name": "IBIS+",
   "version": "1.0",
-  "description": "Visar ett lags 5 senaste resultat i IBIS",
+  "description": "Förbättrar IBIS (statistik.innebandy.se), med ett lags fem senaste resultat.",
   "permissions": ["scripting", "activeTab"],
   "host_permissions": ["http://statistik.innebandy.se/*"],
   "background": {
     "service_worker": "background.js"
   },
+  "icons": {
+    "16": "images/ibis+16.png",
+    "32": "images/ibis+32.png",
+    "48": "images/ibis+48.png",
+    "128": "images/ibis+128.png"
+  },
   "content_scripts": [
     {
-      "matches": ["http://statistik.innebandy.se/ft.aspx?scr=table*"],
+      "matches": ["http://statistik.innebandy.se/ft.aspx*"],
       "js": ["content.js"],
       "css": ["style.css"]
     }

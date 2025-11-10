@@ -1,16 +1,17 @@
-.team-form-section {
-  margin-top: 4px;
-  display: flex;
-  gap: 3px;
-  font-size: 12px;
-}
-
 .match-result {
   display: inline-block;
   font-weight: bold;
   cursor: default;
   height: 12px;
   width: 12px;
+}
+
+.match-result-container {
+  display: flex;
+  gap: 3px;
+  justify-content: flex-end;
+  justify-self: center;
+  width: 72px;
 }
 
 .outline {
