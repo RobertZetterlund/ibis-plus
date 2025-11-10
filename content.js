@@ -49,6 +49,7 @@ init();
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "parseHTML") {
     const { html, teamName, placement } = message;
+    const spacelessTeamName = teamName.replaceAll(" ", "");
 
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");
@@ -60,7 +61,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
     // filter matches involving this team
     const teamMatches = matchRows.filter((tr) =>
-      tr.textContent.includes(teamName)
+      tr.textContent.replaceAll(" ", "").includes(spacelessTeamName)
     );
 
     // get last 5 matches
@@ -75,7 +76,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       const matchDesc =
         tr.querySelector("td:nth-child(3)")?.textContent.trim() || "";
 
-      const [homeTeam, awayTeam] = matchDesc.split(" - ").map((t) => t.trim());
+      const [homeTeam, awayTeam] = matchDesc
+        .split("-")
+        .map((t) => t.replaceAll(" ", ""));
       const [homeScore, awayScore] = scoreText
         .split("-")
         .map((s) => parseInt(s.trim(), 10));
@@ -84,7 +87,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       let code = "D";
 
       if (!isNaN(homeScore) && !isNaN(awayScore)) {
-        const isHome = teamName === homeTeam;
+        const isHome = spacelessTeamName === homeTeam;
         const won =
           (isHome && homeScore > awayScore) ||
           (!isHome && awayScore > homeScore);
