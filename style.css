@@ -14,6 +14,16 @@
   width: 72px;
 }
 
+td.placement {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+td.placement div {
+  margin-bottom: -3px;
+  margin-left: 1px;
+}
+
 .outline {
   stroke: transparent;
   fill: transparent;

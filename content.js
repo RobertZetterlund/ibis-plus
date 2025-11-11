@@ -1,4 +1,8 @@
 /**
+ * TODO:(robertz), account fo teams that have exited league (http://statistik.innebandy.se/ft.aspx?scr=table&ftid=41620)
+ */
+
+/**
  * Adds header to table, and requests the html from background worker.
  */
 async function init() {
@@ -21,21 +25,22 @@ async function init() {
   formHeaderCell.textContent = "5 Senaste";
   headerRow.appendChild(formHeaderCell);
 
-  // Find the <td> elements that have the text "Totalt"
-  const cells = Array.from(
-    document.querySelectorAll("table.clTblStandings thead td")
-  ).filter((td) => td.textContent.trim() === "Totalt");
+  // Find the <td> element that have the text "Totalt"
+  const td = document.querySelector(
+    "table.clTblStandings thead tr:nth-child(1) td:nth-child(2)"
+  );
 
   // increment the colspan so it extends over new column
-  cells.forEach((td) => {
-    // Get the current colspan (default to 1 if missing)
-    const current = parseInt(td.getAttribute("colspan")) || 1;
-    td.setAttribute("colspan", current + 1);
-  });
+  const current = parseInt(td.getAttribute("colspan")) || 1;
+  td.setAttribute("colspan", current + 1);
 
   const tableData = Array.from(teamLinks).map((link, idx) => ({
     teamName: link.innerHTML.trim(),
     placement: idx + 1,
+    points: Number(
+      table.querySelector(`tbody tr:nth-child(${idx + 1}) td:nth-child(9)`)
+        .textContent
+    ),
   }));
 
   chrome.runtime.sendMessage({
@@ -58,6 +63,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       tr.querySelector(".clScore")
     );
 
+    const table = document.querySelector(".clCommonGrid.clTblStandings");
+    const prevStandings = [];
+
+    let position = 1;
     for (const tableResult of tableData) {
       // spaceless because sometimes the formatting is different between table and play-program view.
       const spacelessTeamName = tableResult.teamName.replaceAll(" ", "");
@@ -72,10 +81,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
       const results = last5.map((tr) => {
         const scoreEl = tr.querySelector(".clScore");
-        const scoreText = (scoreEl ? scoreEl.textContent.trim() : "").replace(
-          /[^0-9-]/g,
-          ""
-        );
+        const scoreTextRaw = scoreEl ? scoreEl.textContent.trim() : "";
+        const scoreText = scoreTextRaw.replace(/[^0-9-]/g, "");
         const matchDesc =
           tr.querySelector("td:nth-child(3)")?.textContent.trim() || "";
 
@@ -88,6 +95,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
         let symbol = "-";
         let code = "D";
+        // 1 point for draw, 3 for win (2 if after extension of play) 0 for loss (1 if after extension)
+        let point = 1;
 
         if (!isNaN(homeScore) && !isNaN(awayScore)) {
           const isHome = spacelessTeamName === homeTeam;
@@ -101,9 +110,17 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           if (won) {
             symbol = "W";
             code = "W";
+            point = 3;
+            if (scoreTextRaw.includes("e.förl.")) {
+              point = 2;
+            }
           } else if (lost) {
             symbol = "X";
             code = "L";
+            point = 0;
+            if (scoreTextRaw.includes("e.förl.")) {
+              point = 1;
+            }
           }
         }
 
@@ -111,41 +128,102 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           teamName: tableResult.teamName,
           symbol,
           result: code,
-          tooltip: `${matchDesc} (${scoreText})`,
+          tooltip: `${matchDesc} (${scoreTextRaw})`,
+          point,
         };
       });
-
-      const table = document.querySelector(".clCommonGrid.clTblStandings");
 
       // get the row in tbody
       const tbody = table.querySelector("tbody");
       const tr = tbody.querySelector(`tr:nth-child(${tableResult.placement})`);
-      const newTd = document.createElement("td");
-      tr.append(newTd);
+
+      addLast5ToTable(tr, results);
+      const prevPoints = getPointsBeforeLastGame(results, tableData, position);
+      prevStandings.push({
+        points: prevPoints,
+        teamName: tableResult.teamName,
+      });
+
+      position++;
+    }
+
+    const prevStandingsSorted = prevStandings.sort(
+      (teamA, teamB) => teamB.points - teamA.points
+    );
+
+    const tableMovements = getTableMovements(prevStandingsSorted, tableData);
+    for (const tableMovement of tableMovements) {
+      // find the Plac. column and add the movement indicator
+      const td = table.querySelector(
+        `tbody tr:nth-child(${tableMovement.placement}) td`
+      );
+      td.className = "placement";
+
       const newDiv = document.createElement("div");
-      newDiv.className = "match-result-container";
-
-      let idx = 0;
-      for (const match of results) {
-        const span = document.createElement("span");
-        span.className = `match-result ${match.result}`;
-        span.title = match.tooltip;
-
-        const resultSvg =
-          match.result === "W"
-            ? winSvg
-            : match.result === "L"
-            ? lossSvg
-            : drawSvg;
-        span.innerHTML = resultSvg;
-
-        newDiv.appendChild(span);
-        idx++;
-      }
-      newTd.appendChild(newDiv);
+      newDiv.innerHTML =
+        tableMovement.movement === "UP"
+          ? movementUpSvg
+          : tableMovement.movement === "DOWN"
+          ? movementDownSvg
+          : movementSameSvg;
+      td.append(newDiv);
     }
   }
 });
+
+function getPointsBeforeLastGame(results, tableData, position) {
+  const currentPoints = tableData.at(position - 1).points;
+  return currentPoints - results.at(-1).point;
+}
+
+/**
+ * Given previous and current standings, returns movement symbols for each team.
+ * @param {Array<{teamName: string, points: number}>} prevStandings
+ * @param {Array<{teamName: string, points: number}>} currentStandings
+ * @returns {Array<{teamName: string, movement: 'UP' | 'DOWN' | 'SAME', diff: number}>}
+ */
+function getTableMovements(prevStandings, currentStandings) {
+  // Build lookup: teamName → previous position
+  const prevPositions = {};
+  prevStandings.forEach((team, index) => {
+    prevPositions[team.teamName] = index + 1;
+  });
+
+  // Compare positions between previous and current standings
+  return currentStandings.map((team, index) => {
+    const currentPos = index + 1;
+    const prevPos = prevPositions[team.teamName] ?? currentPos; // fallback if new team
+    const diff = prevPos - currentPos; // positive = moved up
+
+    let movement = "SAME";
+    if (diff > 0) movement = "UP";
+    else if (diff < 0) movement = "DOWN";
+
+    return { teamName: team.teamName, movement, diff, placement: currentPos };
+  });
+}
+
+function addLast5ToTable(tr, results) {
+  const newTd = document.createElement("td");
+  tr.append(newTd);
+  const newDiv = document.createElement("div");
+  newDiv.className = "match-result-container";
+
+  let idx = 0;
+  for (const match of results) {
+    const span = document.createElement("span");
+    span.className = `match-result ${match.result}`;
+    span.title = match.tooltip;
+
+    const resultSvg =
+      match.result === "W" ? winSvg : match.result === "L" ? lossSvg : drawSvg;
+    span.innerHTML = resultSvg;
+
+    newDiv.appendChild(span);
+    idx++;
+  }
+  newTd.appendChild(newDiv);
+}
 
 const winSvg = `<svg aria-hidden="true" viewBox="0 0 22 22" height=12>
     <path class="oUnRP" d="M11 3a8 8 0 1 1 0 16 8 8 0 0 1 0-16"></path>
@@ -186,3 +264,13 @@ fill-rule="evenodd"
       fill-rule="evenodd"
     ></path>
   </svg>`;
+
+const movementDownSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="10px" height="10px" viewBox="0 0 24 24" fill="#ea4335">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M4.29289 8.29289C4.68342 7.90237 5.31658 7.90237 5.70711 8.29289L12 14.5858L18.2929 8.29289C18.6834 7.90237 19.3166 7.90237 19.7071 8.29289C20.0976 8.68342 20.0976 9.31658 19.7071 9.70711L12.7071 16.7071C12.3166 17.0976 11.6834 17.0976 11.2929 16.7071L4.29289 9.70711C3.90237 9.31658 3.90237 8.68342 4.29289 8.29289Z"/>
+</svg>`;
+const movementUpSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="10px" height="10px" viewBox="0 0 24 24" fill="#34a853">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M12 7C12.2652 7 12.5196 7.10536 12.7071 7.29289L19.7071 14.2929C20.0976 14.6834 20.0976 15.3166 19.7071 15.7071C19.3166 16.0976 18.6834 16.0976 18.2929 15.7071L12 9.41421L5.70711 15.7071C5.31658 16.0976 4.68342 16.0976 4.29289 15.7071C3.90237 15.3166 3.90237 14.6834 4.29289 14.2929L11.2929 7.29289C11.4804 7.10536 11.7348 7 12 7Z"/>
+</svg>`;
+const movementSameSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="10px" height="10px" viewBox="0 0 24 24" fill="#a4a79b">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M4 12C4 11.4477 4.44772 11 5 11H19C19.5523 11 20 11.4477 20 12C20 12.5523 19.5523 13 19 13H5C4.44772 13 4 12.5523 4 12Z" fill="#000000"/>
+</svg>`;
