@@ -1,8 +1,4 @@
 /**
- * TODO:(robertz), account fo teams that have exited league (http://statistik.innebandy.se/ft.aspx?scr=table&ftid=41620)
- */
-
-/**
  * Adds header to table, and requests the html from background worker.
  */
 async function init() {
@@ -34,14 +30,22 @@ async function init() {
   const current = parseInt(td.getAttribute("colspan")) || 1;
   td.setAttribute("colspan", current + 1);
 
-  const tableData = Array.from(teamLinks).map((link, idx) => ({
-    teamName: link.innerHTML.trim(),
-    placement: idx + 1,
-    points: Number(
-      table.querySelector(`tbody tr:nth-child(${idx + 1}) td:nth-child(9)`)
-        .textContent
-    ),
-  }));
+  const tableData = Array.from(teamLinks)
+    .map((link, idx) => {
+      const tr = table.querySelector(`tbody tr:nth-child(${idx + 1})`);
+      // Remove teams that have opted out of the league.
+      if (tr.textContent.includes("Utgått")) {
+        return null;
+      }
+      const td = tr.querySelector("td:nth-child(9)");
+
+      return {
+        teamName: link.innerHTML.trim(),
+        placement: idx + 1,
+        points: Number(td.textContent),
+      };
+    })
+    .filter((row) => !!row);
 
   chrome.runtime.sendMessage({
     action: "getTeamForm",

@@ -2,8 +2,7 @@
   "manifest_version": 3,
   "name": "IBIS+",
   "version": "1.0",
-  "description": "Förbättrar IBIS (statistik.innebandy.se), med ett lags fem senaste resultat.",
-  "permissions": ["scripting"],
+  "description": "Förbättrar IBIS (statistik.innebandy.se), med ett lags fem senaste resultat och relativa förändringar.",
   "background": {
     "service_worker": "background.js"
   },
