@@ -7,3 +7,19 @@
 </p>
 
 ![table](/images/table.jpg)
+
+TODO:
+
+-
+
+1. Fix player profiles by allowing http://statistik.innebandy.se/ft.aspx?fplid=171817&scr=playercareer to render by referencing the data from https://stats.innebandy.se/spelare/171817
+
+use the shared css from `fogis.css` and `edt.css`
+
+2. Remove "(Saknas år)" from player listings, they add no value.
+
+3. Add dark mode
+
+4. Add "Add to calendar" for matches http://statistik.innebandy.se/ft.aspx?scr=teamresult&flid=119745
+
+5. Add team colors with shirt, short and socks graphic.
