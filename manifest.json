@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "IBIS+",
-  "version": "1.0",
+  "version": "1.1",
   "description": "Förbättrar IBIS (statistik.innebandy.se), med ett lags fem senaste resultat och relativa förändringar.",
   "background": {
     "service_worker": "background.js"
