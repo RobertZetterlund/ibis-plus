@@ -55,6 +55,17 @@ async function init() {
 }
 init();
 
+function improveTablePage() {}
+
+document.querySelectorAll("a[href]").forEach((a) => {
+  if (a.href.includes("?scr=playercareer")) {
+    const fplid = new URL(a.href).searchParams.get("fplid");
+    a.href = `https://stats.innebandy.se/spelare/${fplid}`;
+    const newText = a.textContent.replaceAll("(Saknas år)", "");
+    a.textContent = newText;
+  }
+});
+
 // Listen for the parsed HTML from background.js, given the data, populates the rows.
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "parseHTML") {
