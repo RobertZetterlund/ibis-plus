@@ -4,12 +4,117 @@
 async function init() {
   // Get the current URL's query string
   const params = new URLSearchParams(window.location.search);
-  const leagueId = params.get("ftid");
+  const scr = params.get("scr");
 
-  // Check if it matches the desired parameters
-  if (!(params.get("scr") === "table" && leagueId)) {
-    return;
+  switch (scr) {
+    case "table": {
+      improveTablePage();
+      break;
+    }
+    case "fixturelist": {
+      improveFixturesPage();
+      break;
+    }
+    case "teamresult": {
+      improveTeamResultsPage();
+      break;
+    }
   }
+}
+init();
+
+function downloadCalendar(table) {
+  // first get the trows for match games
+  const trows = Array.from(
+    table.querySelectorAll("tbody tr:has(td:nth-of-type(2))")
+  );
+
+  let ics =
+    "BEGIN:VCALENDAR\n" +
+    "VERSION:2.0\n" +
+    "CALSCALE:GREGORIAN\n" +
+    "PRODID:-//Ibis+//EN\n";
+
+  // td order is
+  // date | competition | fixture | results (if any) | location
+  for (const row of trows) {
+    const date = row.querySelector("td:nth-child(1)").textContent;
+    const fixture = row.querySelector("td:nth-child(3)").textContent;
+    const location = row.querySelector("td:last-child").textContent;
+    const startDate = new Date(date);
+    const endDate = new Date(startDate.getTime() + 2 * 60 * 60 * 1000);
+
+    ics +=
+      "BEGIN:VEVENT\n" +
+      `UID:${uuidv4()}\n` +
+      `DTSTAMP:${formatDate(startDate)}\n` +
+      `DTSTART:${formatDate(startDate)}\n` +
+      `DTEND:${formatDate(endDate)}\n` +
+      `SUMMARY:${fixture}\n` +
+      `LOCATION:${location}\n` +
+      "END:VEVENT\n";
+  }
+
+  ics += "END:VCALENDAR";
+
+  const blob = new Blob([ics], { type: "text/calendar" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download =
+    document
+      .querySelector("h1")
+      .textContent.replaceAll("Lagets matcher säsongen ", "")
+      .trim() + ".ics";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function addDownloadButton(table) {
+  // Add calendar events for all matches
+  const btn = document.createElement("button");
+  btn.textContent = "Lägg till i kalender";
+  btn.id = "fixtures-download";
+
+  const theadRow = table.querySelector("thead tr:nth-child(1)");
+  const headerTd = theadRow.querySelector("td");
+  const headerTdColspan = parseInt(headerTd.getAttribute("colspan")) || 1;
+  headerTd.setAttribute("colspan", headerTdColspan - 2);
+  // add td to place button in
+  const buttonHeaderTd = document.createElement("td");
+  buttonHeaderTd.setAttribute("colspan", 2);
+  theadRow.append(buttonHeaderTd);
+  buttonHeaderTd.appendChild(btn);
+
+  btn.addEventListener("click", () => {
+    downloadCalendar(table);
+  });
+}
+
+function improveFixturesPage() {
+  const fixturesTable = Array.from(
+    document.querySelectorAll(".clCommonGrid")
+  ).at(1);
+  addDownloadButton(fixturesTable);
+}
+
+function improveTeamResultsPage() {
+  const table = document.querySelector(".clCommonGrid");
+  addDownloadButton(table);
+}
+
+// Format date into ICS-compatible UTC format
+function formatDate(date) {
+  return date
+    .toISOString()
+    .replace(/[-:]/g, "")
+    .replace(/\.\d+Z$/, "Z");
+}
+
+function improveTablePage() {
+  const params = new URLSearchParams(window.location.search);
+  const leagueId = params.get("ftid");
 
   const teamLinks = document.querySelectorAll('.clGrid a[href*="flid="]');
   const table = document.querySelector(".clCommonGrid.clTblStandings");
@@ -53,10 +158,8 @@ async function init() {
     leagueId,
   });
 }
-init();
 
-function improveTablePage() {}
-
+// Fix all links to players to work (by using the stats.innebandy.se link)
 document.querySelectorAll("a[href]").forEach((a) => {
   if (a.href.includes("?scr=playercareer")) {
     const fplid = new URL(a.href).searchParams.get("fplid");
@@ -108,7 +211,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           .split("-")
           .map((s) => parseInt(s.trim(), 10));
 
-        let symbol = "-";
         let code = "D";
         // 1 point for draw, 3 for win (2 if after extension of play) 0 for loss (1 if after extension)
         let point = 1;
@@ -123,14 +225,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             (!isHome && awayScore < homeScore);
 
           if (won) {
-            symbol = "W";
             code = "W";
             point = 3;
             if (scoreTextRaw.includes("e.förl.")) {
               point = 2;
             }
           } else if (lost) {
-            symbol = "X";
             code = "L";
             point = 0;
             if (scoreTextRaw.includes("e.förl.")) {
@@ -141,7 +241,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
         return {
           teamName: tableResult.teamName,
-          symbol,
           result: code,
           tooltip: `${matchDesc} (${scoreTextRaw})`,
           point,
@@ -289,3 +388,22 @@ const movementUpSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="10px" heig
 const movementSameSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="10px" height="10px" viewBox="0 0 24 24" fill="#a4a79b">
 <path fill-rule="evenodd" clip-rule="evenodd" d="M4 12C4 11.4477 4.44772 11 5 11H19C19.5523 11 20 11.4477 20 12C20 12.5523 19.5523 13 19 13H5C4.44772 13 4 12.5523 4 12Z" fill="#000000"/>
 </svg>`;
+
+function uuidv4() {
+  // uses Web Crypto if available
+  if (crypto && crypto.getRandomValues) {
+    return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c) =>
+      (
+        c ^
+        (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))
+      ).toString(16)
+    );
+  } else {
+    // fallback (Math.random)
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+      const r = (Math.random() * 16) | 0;
+      const v = c === "x" ? r : (r & 0x3) | 0x8;
+      return v.toString(16);
+    });
+  }
+}
