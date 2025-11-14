@@ -1,5 +1,7 @@
 <p align="center">
-<img width="128" height="128" alt="ibis+128" src="/images/ibis+128.png" />
+  <a href="https://chromewebstore.google.com/detail/ibis+/gnafengimackgbckodokckgiinofafgh"> 
+   <img width="128" height="128" alt="ibis+128" src="/images/ibis+128.png" />
+  </a>
 </p>
 
 <h3 align="center" >
