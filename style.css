@@ -1,9 +1,13 @@
 .match-result {
   display: inline-block;
   font-weight: bold;
-  cursor: default;
+  cursor: pointer;
   height: 12px;
   width: 12px;
+  transition: transform 0.1s ease-in-out;
+}
+.match-result:hover {
+  transform: scale(1.2);
 }
 
 .match-result-container {

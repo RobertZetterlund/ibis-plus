@@ -201,8 +201,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         const scoreEl = tr.querySelector(".clScore");
         const scoreTextRaw = scoreEl ? scoreEl.textContent.trim() : "";
         const scoreText = scoreTextRaw.replace(/[^0-9-]/g, "");
-        const matchDesc =
-          tr.querySelector("td:nth-child(3)")?.textContent.trim() || "";
+        const matchTd = tr.querySelector("td:nth-child(3)");
+        const matchDesc = matchTd?.textContent.trim() || "";
+        const matchLink = matchTd.querySelector("a").href;
 
         const [homeTeam, awayTeam] = matchDesc
           .split("-")
@@ -244,6 +245,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           result: code,
           tooltip: `${matchDesc} (${scoreTextRaw})`,
           point,
+          matchLink,
         };
       });
 
@@ -325,15 +327,16 @@ function addLast5ToTable(tr, results) {
 
   let idx = 0;
   for (const match of results) {
-    const span = document.createElement("span");
-    span.className = `match-result ${match.result}`;
-    span.title = match.tooltip;
+    const aLink = document.createElement("a");
+    aLink.className = `match-result ${match.result}`;
+    aLink.title = match.tooltip;
 
     const resultSvg =
       match.result === "W" ? winSvg : match.result === "L" ? lossSvg : drawSvg;
-    span.innerHTML = resultSvg;
+    aLink.innerHTML = resultSvg;
+    aLink.href = match.matchLink;
 
-    newDiv.appendChild(span);
+    newDiv.appendChild(aLink);
     idx++;
   }
   newTd.appendChild(newDiv);
