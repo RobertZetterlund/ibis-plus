@@ -1,0 +1,15 @@
+{
+  "name": "ibis-plus",
+  "type": "module",
+  "scripts": {
+    "build": "vite build && cp dist/homepage.js ../homepage.js",
+    "dev": "vite build --watch"
+  },
+  "dependencies": {
+    "preact": "^10.19.3"
+  },
+  "devDependencies": {
+    "@preact/preset-vite": "^2.5.0",
+    "vite": "^5.0.0"
+  }
+}

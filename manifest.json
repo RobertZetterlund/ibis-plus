@@ -6,6 +6,8 @@
   "background": {
     "service_worker": "background.js"
   },
+  "host_permissions": ["*://statistik.innebandy.se/*"],
+  "permissions": ["webNavigation", "storage"],
   "icons": {
     "16": "images/ibis+16.png",
     "32": "images/ibis+32.png",
@@ -17,6 +19,15 @@
       "matches": ["http://statistik.innebandy.se/ft.aspx*"],
       "js": ["content.js"],
       "css": ["style.css"]
+    },
+    {
+      "matches": ["http://statistik.innebandy.se/"],
+      "js": ["homepage.js"],
+      "css": ["homepage.css"]
+    },
+    {
+      "matches": ["http://statistik.innebandy.se/*"],
+      "js": ["global.js"]
     }
   ]
 }

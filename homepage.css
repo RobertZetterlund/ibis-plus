@@ -1,0 +1,806 @@
+html,
+body {
+  display: none;
+}
+
+body {
+  background-color: white !important;
+}
+
+/* Linked to from SDF sites and KO */
+
+/* Generella regler */
+#idFogisTemplate {
+  padding: 0 2px 10px 2px;
+}
+.clCommonGrid {
+  border: 1px solid #dfdfdf;
+  border-collapse: collapse;
+  margin: 10px 0;
+  padding: 0;
+  width: 100%;
+}
+#iMatchInfo {
+  margin-top: 0px;
+}
+.clCommonGrid thead tr th {
+  border: 1px solid #dfdfdf;
+  padding: 2px 5px;
+  /* background: #7e7e7e; Edit for each */
+  color: #fff;
+  text-align: left;
+}
+.clCommonGrid thead tr td {
+  border: 1px solid #dfdfdf;
+  padding: 2px 5px;
+  border: 1px solid #dfdfdf;
+  /* background: #363636; Edit for each */
+  color: #fff;
+  font-weight: bold;
+}
+.clGrid .clInternalHeader a:link,
+.clGrid .clInternalHeader a:visited {
+  color: #fff;
+  font-weight: bold;
+}
+.clCommonGrid tbody tr.clTrEven {
+  background: #ececec;
+  color: #000;
+}
+.clCommonGrid tbody tr th {
+  border: 1px solid #dfdfdf;
+  padding: 2px 5px;
+}
+.clCommonGrid tbody tr td {
+  border-bottom: 1px solid #dfdfdf;
+  /*border-top: 1px solid #dfdfdf;*/
+  border-left: 1px solid #dfdfdf;
+  border-right: 1px solid #dfdfdf;
+  padding: 2px 5px;
+  vertical-align: top;
+}
+
+/* Tabell */
+.clTblStandings thead tr th {
+  text-align: center;
+}
+.clTblStandings tbody tr.clTrEven {
+  background: #ececec;
+  color: #000;
+}
+.clTblStandings tbody tr.clTrDelimiter td {
+  border-bottom: 1px solid #000;
+}
+.clTblStandings tbody tr.clTrDelimiter2 td {
+  border-bottom: 1px dashed #000;
+}
+
+.clTblStandings tbody tr td {
+  padding: 2px 3px;
+  text-align: center;
+  vertical-align: top;
+}
+.clTblStandings tbody tr td.clTextAlignLeft {
+  text-align: left;
+}
+.clTblStandings tbody tr td.clBold {
+  font-weight: bold;
+}
+.clTblStandings tbody tr td.clTdSortColumn {
+  font-weight: bold;
+  color: #000;
+}
+.clTblStandings tfoot dl,
+.clCommonGrid tfoot dl {
+  margin: 0;
+  padding: 3px;
+}
+.clTblStandings tfoot dt,
+.clCommonGrid tfoot dt {
+  display: inline;
+  font-weight: bold;
+}
+.clTblStandings tfoot dd,
+.clCommonGrid tfoot dd {
+  display: inline;
+  margin: 0;
+  padding: 0;
+}
+
+/* Definitionslista */
+.clFogis dl {
+  margin: 0.3em 0;
+  padding: 0;
+  font-size: 90%;
+}
+
+.clFogis dt {
+  position: relative;
+  left: 0;
+  top: 1em;
+  width: 12em;
+  font-weight: bold;
+}
+
+.clFogis dd {
+  border-left: 1px solid #dfdfdf;
+  margin: 0 0 0 13em;
+  padding: 0 0 0em 0.5em;
+}
+
+/* Formulär och fältset */
+.clFogis form {
+  margin: 0;
+  font-size: 90%;
+}
+.clFogis fieldset {
+  clear: both;
+  margin: 3px 0;
+  border: 1px solid #dfdfdf;
+  padding: 6px;
+}
+.clFogis .clButton {
+  clear: both;
+}
+.clFogis .clFormRow {
+  clear: both;
+  padding-top: 3px;
+}
+.clFogis .clFormRow label {
+  display: block;
+  float: left;
+  width: 12em;
+}
+.clFogis .clFormRow input,
+.clFogis .clFormRow select {
+  display: block;
+  float: left;
+  width: auto;
+}
+
+.clSelectList {
+  display: none;
+}
+
+.clTblStandings thead tr th.clTextAlignLeft,
+clTextAlignLeft {
+  text-align: left;
+}
+.clTextAlignCenter {
+  text-align: center;
+}
+.clTextAlignRight {
+  text-align: right;
+}
+.clBold {
+  font-weight: bold;
+}
+.clBold a:link,
+.clBold a:visited,
+.clBold a:hover,
+.clBold a:active {
+  font-weight: bold;
+}
+.clGrid .clBold a:link,
+.clGrid .clBold a:visited,
+.clGrid .clBold a:hover,
+.clGrid .clBold a:active {
+  font-weight: bold;
+}
+.clNotify,
+a.clNotify:link,
+a.clNotify:visited,
+a.clNotify:hover,
+a.clNotify:active,
+.clGrid .clNotify,
+.clGrid a.clNotify:link,
+.clGrid a.clNotify:visited,
+.clGrid a.clNotify:hover,
+.clGrid a.clNotify:active {
+  color: #ff0000;
+}
+.clClear {
+  clear: both;
+}
+
+ul.clFogisMenu {
+  margin: 0 0 15px 0;
+  padding: 8px 0;
+  list-style: none;
+  color: #000;
+}
+ul.clFogisMenu li {
+  display: inline;
+  margin: 0 2px 0 0;
+  padding: 0;
+  font-weight: bold;
+  font-size: 10px;
+}
+.clFogisMenu a:link,
+.clFogisMenu a:visited,
+.clFogisMenu a:hover {
+  display: inline;
+  padding: 5px;
+  background-color: #eee;
+  border: 1px solid #dcdcdc;
+}
+.clFogisMenu a:hover {
+  background-color: #6c6c6c;
+  color: #dcdcdc;
+}
+.clFogisMenu li.clSel {
+  display: inline;
+  text-decoration: none;
+  padding: 5px;
+  color: #b6b6b6;
+  background-color: #f1f1f1;
+  border: 1px solid #a2a2a2;
+}
+
+/* Matcher idag och matchfakta */
+#iList {
+  display: block;
+  float: left;
+  width: 100%;
+}
+#iSelection {
+  display: block;
+  float: left;
+  width: 40%;
+}
+#iSelection div {
+  padding-left: 3px;
+}
+#iSelection .logo {
+  margin-bottom: 10px;
+}
+
+/* Felmeddelande */
+.clError {
+  color: #ff0000;
+  border: solid 1px Red;
+  padding: 6px;
+  margin: 10px 0;
+}
+
+.clCommonGrid tbody tr td .clTblClean tr td,
+.clCommonGrid tbody tr td .clTblClean tr th .clTblClean tr td,
+.clTblClean tr th {
+  border: 1px solid #fff;
+}
+
+/* Matchresultat/händelsetabell */
+.clTblMatch {
+  border: 0;
+  margin: 0;
+  width: 100%;
+}
+.clTblMatch thead td {
+  font-weight: bold;
+  background: #ececec;
+  text-align: center;
+}
+.clTblMatch thead th {
+  background: #fff;
+  text-align: center;
+}
+.clTblMatch tfoot tr td {
+  background: #fff;
+  border: 0;
+}
+.clTblMatch th,
+.clTblMatch td {
+  border: 0;
+  padding: 3px 4px;
+}
+
+/* Domare idag */
+th.league-grouping {
+  text-align: left;
+  font-size: 15px;
+  font-weight: bold;
+}
+th.league-name {
+  text-align: left;
+  font-weight: bold;
+}
+th.league-name a {
+  font-weight: bold;
+}
+
+.clItalic {
+  font-style: italic;
+}
+
+.noMarginBottom {
+  margin-bottom: 0px !important;
+}
+
+.staffTable {
+  margin-bottom: 20px;
+}
+
+.nav-container ul {
+  list-style-type: none;
+  padding: 0.2em;
+  margin: 0;
+}
+
+.nav-container ul li {
+  display: inline;
+}
+
+.nav-container ul li a {
+  text-decoration: none;
+  padding: 0.2em 1em;
+  background-color: #000;
+  color: #fff;
+}
+
+.nav-container ul li a:hover {
+  text-decoration: underline;
+  font-weight: bold;
+  cursor: auto;
+}
+
+a.social {
+  margin: 10px;
+}
+
+div.ibisinfo {
+  float: left;
+  width: 70%;
+}
+
+div.banner {
+  float: left;
+  width: 30%;
+}
+
+.trPlayerStatsSummary {
+  border-top: 1px solid black !important;
+  font-weight: bold;
+}
+
+.trPlayerStatsGrandTotal {
+  color: #fff;
+  font-weight: bold;
+  background: #000;
+  padding: 4px 6px;
+}
+
+.trPlayerStatsGrandTotal td {
+  padding: 4px 6px;
+}
+
+body,
+p,
+th,
+td,
+ul,
+select,
+input,
+textarea,
+button {
+  font-family: verdana, arial, helvetica, sans-serif;
+  font-size: 10px;
+}
+p {
+  padding: 0;
+  margin-top: 0px;
+  margin-bottom: 10px;
+}
+ul,
+ol {
+  margin-top: 0px;
+  margin-bottom: 7px;
+}
+li {
+  margin-top: 3px;
+  margin-bottom: 3px;
+}
+h1,
+.header1 {
+  display: block;
+  font-size: 18px;
+  color: #000;
+  padding: 0;
+  margin: 0 0 5px 0;
+}
+h2,
+.header2 {
+  display: block;
+  font-size: 15px;
+  color: #000;
+  padding: 0;
+  margin: 0 0 5px 0;
+}
+h3 {
+  display: block;
+  font-size: 12px;
+  color: #000;
+  padding: 0;
+  margin: 0 0 5px 0;
+}
+h4 {
+  display: block;
+  font-size: 11px;
+  color: #000;
+  padding: 0;
+  margin: 0 0 2px 0;
+}
+img {
+  border: 0;
+}
+
+/* Links */
+a:link,
+a:visited {
+  font-weight: bold;
+  color: #233446;
+  text-decoration: none;
+}
+a:focus,
+a:hover {
+  font-weight: bold;
+  color: #233446;
+  text-decoration: underline;
+}
+
+/* ----Top right */
+#tr a:link,
+#tr a:visited {
+  font-weight: normal;
+  color: #000;
+  text-decoration: none;
+}
+#tr a:focus,
+#tr a:hover {
+  font-weight: normal;
+  color: #000;
+  text-decoration: underline;
+}
+
+/* ----Footer */
+#ftr a:link,
+#ftr a:visited {
+  font-weight: bold;
+  color: #fff;
+  text-decoration: none;
+}
+#ftr a:focus,
+#ftr a:hover {
+  font-weight: bold;
+  color: #fff;
+  text-decoration: underline;
+}
+
+/* ----Newsbox main news */
+.nwsmart h3 a:link,
+.nwsmart h3 a:visited,
+.nwsmart h3 a:focus,
+.nwsmart h3 a:hover {
+  font-weight: bold;
+  color: #000;
+  text-decoration: none;
+}
+.nwsmart a:link,
+.nwsmart a:visited,
+.nwsmart a:focus,
+.nwsmart a:hover,
+.neulst a:link,
+.neulst a:visited,
+.neulst a:focus,
+.neulst a:hover {
+  font-weight: normal;
+  color: #000;
+  text-decoration: none;
+}
+
+/* ----Newsbox link news */
+.nwslart a:link,
+.nwslart a:visited {
+  font-weight: normal;
+  color: #000;
+  text-decoration: none;
+}
+.nwslart a:focus,
+.nwslart a:hover {
+  font-weight: normal;
+  color: #000;
+  text-decoration: underline;
+}
+
+/* ----Newsbox link news */
+.clGrid a:link,
+.clGrid a:visited {
+  font-weight: normal;
+  color: #000;
+  text-decoration: none;
+}
+.clGrid a:focus,
+.clGrid a:hover {
+  font-weight: normal;
+  color: #000;
+  text-decoration: underline;
+}
+
+/* ----Print and send to link */
+#bc a:link,
+.contftr a:link,
+#bc a:visited,
+.contftr a:visited {
+  font-weight: normal;
+  color: #b2b2b2;
+  text-decoration: none;
+}
+#bc a:focus,
+.contftr a:focus,
+#bc a:hover,
+.contftr a:hover {
+  font-weight: normal;
+  color: #b2b2b2;
+  text-decoration: underline;
+}
+
+/* Recurring */
+.mrgt10 {
+  margin-top: 10px;
+}
+.mrgt5 {
+  margin-top: 5px;
+}
+.mrgt2 {
+  margin-top: 2px;
+}
+.mrgb5 {
+  margin-bottom: 5px;
+}
+.mrgb2 {
+  margin-bottom: 2px;
+}
+.tdl {
+  text-align: left;
+}
+.tdc {
+  text-align: center;
+}
+.tdr {
+  text-align: right;
+}
+
+/* Fogis - start */
+.clCommonGrid thead tr th {
+  background: #98a9bb;
+  color: #000;
+}
+.clCommonGrid thead tr td {
+  background: #233446;
+}
+/* Specials for SvFF only not for SDF sites */
+.clCommonGrid {
+  margin-top: 0px;
+}
+.clTblMatch thead td {
+  font-size: 11px;
+}
+.clFogis dl {
+  font-size: 10px;
+}
+.clFogis form {
+  font-size: 10px;
+}
+/* Fogis - end */
+
+/* Fogis gray colors for KO */
+.clCommonGrid thead tr th {
+  background: #7e7e7e;
+  color: #fff;
+}
+.clCommonGrid thead tr td {
+  background: #363636;
+}
+
+.clInternalHeader {
+  color: #fff;
+  background: #363636;
+  text-align: center;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.clMainHeader {
+  color: #fff;
+  background: #363636;
+  text-align: center;
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.clInternalSubHeader {
+  color: #fff;
+  background: #7e7e7e;
+  text-align: center;
+}
+
+.clFogisInfo {
+  color: #909090;
+  padding-top: 20px;
+}
+.clear {
+  clear: both;
+}
+
+.clTblMatch {
+  width: 100%;
+  border: none;
+  padding: 0px;
+}
+.clTblPlayerCareer {
+  width: 100%;
+}
+
+.PlayerName {
+  font-size: 120%;
+}
+.clTblPlayerCareer tr th {
+  background: #000;
+  color: #fff;
+  padding: 4px 6px;
+  border-spacing: 0px;
+}
+
+.clTblMatch tr th {
+  background: #000;
+  color: #fff;
+}
+
+.clTblMatchStanding {
+  width: 100%;
+}
+.clTblMatchStanding th {
+  background: #000;
+  color: #fff;
+  font-size: 150%;
+}
+
+.clTblMatchStanding th a {
+  color: #fff;
+}
+
+.clPeriodStart {
+  background: #000;
+  color: #fff;
+  text-align: center;
+  font-weight: bold;
+}
+
+#iSelection {
+  width: 100%;
+  float: none;
+}
+
+.clTblMatchTime,
+.clTblMatchStanding {
+  text-align: center;
+}
+
+.tblPlayerStatsNumber {
+  text-align: center;
+}
+
+tr.tblRowSummary td {
+  border-top-style: solid;
+  border-top-color: #000;
+  border-top-width: 1px;
+  font-weight: bold;
+}
+
+/* Sortable table style */
+table.tablesorter {
+  font-family: arial;
+  background-color: #7e7e7e;
+  color: #fff;
+  margin: 10px 0pt 15px;
+  font-size: 8pt;
+  width: 100%;
+  text-align: left;
+}
+table.tablesorter thead tr th,
+table.tablesorter tfoot tr th {
+  background-color: #7e7e7e;
+  border: 1px solid #fff;
+  font-size: 8pt;
+  padding: 4px;
+}
+table.tablesorter thead tr .header {
+  background-image: url(bg_white.png);
+  background-repeat: no-repeat;
+  background-position: center right;
+  cursor: pointer;
+}
+table.tablesorter tbody td {
+  color: #3d3d3d;
+  padding: 4px;
+  background-color: #fff;
+  vertical-align: top;
+}
+table.tablesorter tbody tr.odd td {
+  background-color: #f0f0f6;
+}
+table.tablesorter thead tr .headerSortUp {
+  background-image: url(asc_white.png);
+}
+table.tablesorter thead tr .headerSortDown {
+  background-image: url(desc_white.png);
+}
+table.tablesorter thead tr .headerSortDown,
+table.tablesorter thead tr .headerSortUp {
+  background-color: #7e7e7e;
+  color: #fff;
+}
+
+.hidden {
+  display: none;
+}
+
+.formContainer {
+  /* border: 1px solid #000; */
+  margin: 5px 5px 5px 5px;
+  padding: 5px 5px 5px 5px;
+}
+
+button.show-hide-pp-bp {
+}
+
+.ibis-info-table {
+  width: 100%;
+}
+
+.ibis-info-table tbody tr:nth-child(even) {
+  background: #ddd;
+}
+
+.ibis-info-table thead tr .header {
+  background-color: #000;
+  color: #fff;
+  cursor: pointer;
+}
+
+.ibis-info-table thead tr .headerSortUp {
+}
+
+.ibis-info-table thead tr .headerSortDown {
+}
+
+div.table {
+  display: table;
+  border-collapse: separate;
+  border-spacing: 5px;
+}
+
+div.row {
+  display: table-row;
+}
+
+div.row div {
+  display: table-cell;
+  margin-left: 5px;
+  margin-top: 5px;
+}
+div.row > div > input,
+div.row > div > select {
+  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  width: 100%;
+  height: 20px;
+}
+
+div.row > div > button {
+  width: 100%;
+}
+
+.ibis-info-table {
+  text-align: center;
+}
